@@ -42,8 +42,10 @@ type Resource struct {
 	Body            Body      `yaml:"body,omitempty"`
 	Is              []string  `yaml:"is,omitempty"`
 	Type            string    `yaml:"type,omitempty"`
+	Required        bool      `yaml:"required,omitempty"`
+	Example         string    `yaml:"example,omitempty"`
 	SecuredBy       []string  `yaml:"securedBy,omitempty"`
-	UriParameters   []string  `yaml:"uirParameters,omitempty"`
+	URIParameters   []string  `yaml:"uriParameters,omitempty"`
 	QueryParameters []string  `yaml:"queryParameters,omitempty"`
 
 	Resources `yaml:",inline"`
