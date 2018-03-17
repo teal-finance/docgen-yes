@@ -10,12 +10,14 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// MarkupDoc describes an HTML document
+// MarkupDoc describes a document to be generated
 type MarkupDoc struct {
-	Opts   MarkupOpts
-	Router chi.Router
-	Doc    Doc
-	Routes map[string]DocRouter // Pattern : DocRouter
+	Opts          MarkupOpts
+	Router        chi.Router
+	Doc           Doc
+	Routes        map[string]DocRouter // Pattern : DocRouter
+	FormattedHTML string
+	RouteHTML     string
 
 	buf *bytes.Buffer
 }
@@ -50,7 +52,7 @@ type MarkupOpts struct {
 // MarkupRoutesDoc builds a document based on routes in a given router
 func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 	mu := &MarkupDoc{Router: r, Opts: opts}
-	if err := mu.Generate(); err != nil {
+	if err := mu.generate(); err != nil {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}
 	return mu.String()
@@ -58,11 +60,11 @@ func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 
 // String pretty prints the document
 func (mu *MarkupDoc) String() string {
-	return mu.buf.String()
+	return mu.FormattedHTML
 }
 
-// Generate builds the document
-func (mu *MarkupDoc) Generate() error {
+// generate builds the document
+func (mu *MarkupDoc) generate() error {
 	if mu.Router == nil {
 		return errors.New("docgen: router is nil")
 	}
@@ -76,19 +78,26 @@ func (mu *MarkupDoc) Generate() error {
 	mu.buf = &bytes.Buffer{}
 	mu.Routes = make(map[string]DocRouter)
 
-	//TODO: get template, build strings, replace holders in template
-	//TODO: if option is set, build and run web server
-	//title, css, intro, routes
-	//r := strings.NewReplacer("{title}", mu.Opts.ProjectPath, "{css}", MilligramMinCSS(), "{intro}", mu.Opts.Intro, "{routes}", mu.WriteRoutes())
-	//htmlString := r.Replace(HTMLTemplate())
+	mu.writeRoutes()
+
+	r := strings.NewReplacer(
+		"{title}", mu.Opts.ProjectPath,
+		"{css}", MilligramMinCSS(),
+		"{intro}", mu.Opts.Intro,
+		"{routes}", mu.Opts.RouteText,
+		"{favicon.ico}", FaviconIcoData(),
+	)
+
+	htmlString := r.Replace(BaseTemplate())
+	mu.FormattedHTML = htmlString
 
 	return nil
 }
 
-// WriteRoutes generates the string for the Routes
-func (mu *MarkupDoc) WriteRoutes() {
-
-	mu.buf.WriteString(fmt.Sprintf("## Routes\n\n"))
+// writeRoutes generates the string for the Routes
+func (mu *MarkupDoc) writeRoutes() {
+	routesHeader := Head(2, "Routes")
+	mu.buf.WriteString(routesHeader)
 
 	// Build a route tree that consists of the full route pattern
 	// and the part of the tree for just that specific route, stored
@@ -108,9 +117,9 @@ func (mu *MarkupDoc) WriteRoutes() {
 		dr := mu.Routes[pat]
 		mu.buf.WriteString(fmt.Sprintf("<details>\n"))
 		mu.buf.WriteString(fmt.Sprintf("<summary>`%s`</summary>\n", pat))
-		mu.buf.WriteString(fmt.Sprintf("\n"))
+
 		printRouter(mu, 0, dr)
-		mu.buf.WriteString(fmt.Sprintf("\n"))
+
 		mu.buf.WriteString(fmt.Sprintf("</details>\n"))
 	}
 
@@ -124,40 +133,50 @@ func (mu *MarkupDoc) WriteRoutes() {
 // Generate the markdown to render the above structure
 func printRouter(mu *MarkupDoc, depth int, dr DocRouter) {
 
-	tabs := ""
-	for i := 0; i < depth; i++ {
-		tabs += "&tab;"
-	}
-
 	// Middlewares
 	middleWares := make([]string, len(dr.Middlewares))
 	for j, mw := range dr.Middlewares {
 		middleWares[j] = ListItem(fmt.Sprintf("[%s](%s)", mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
 	}
-	//middleWaresList := HTMLUnorderedList(strings.Join(middleWares, ""))
+	middleWaresList := UnorderedList(strings.Join(middleWares, ""))
 
-	//routeListItems := make([]string, len(dr.Routes))
 	// Routes
+	routeListItems := make([]string, len(dr.Routes))
+	ri := -1
 	for _, rt := range dr.Routes {
-		mu.buf.WriteString(fmt.Sprintf("%s- **%s**\n", tabs, rt.Pattern))
-		//currPattern := rt.Pattern
+		ri++
 
+		// RECURSION AAAAHHHHH NOOOOO
 		if rt.Router != nil {
 			printRouter(mu, depth+1, *rt.Router)
 		} else {
+			// Route Handler Methods
+			methods := make([]string, len(rt.Handlers))
+			mi := -1
 			for meth, dh := range rt.Handlers {
-				mu.buf.WriteString(fmt.Sprintf("%s\t- _%s_\n", tabs, meth))
+				mi++
 
+				innerMiddles := make([]string, len(dh.Middlewares))
+				imi := -1
 				// Handler middlewares
 				for _, mw := range dh.Middlewares {
-					mu.buf.WriteString(fmt.Sprintf("%s\t\t- [%s](%s)\n", tabs, mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
+					imi++
+					innerMiddles[imi] = ListItem(fmt.Sprintf("[%s](%s)", mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
 				}
+				innerMiddlesList := UnorderedList(strings.Join(innerMiddles, ""))
 
 				// Handler endpoint
-				mu.buf.WriteString(fmt.Sprintf("%s\t\t- [%s](%s)\n", tabs, dh.Func, mu.githubSourceURL(dh.File, dh.Line)))
+				handlerEndpoint := fmt.Sprintf("[%s](%s)", dh.Func, mu.githubSourceURL(dh.File, dh.Line))
+				mu.buf.WriteString(handlerEndpoint)
+
+				methods[mi] = ListItem(meth + " " + handlerEndpoint + "<br />" + Div(innerMiddlesList))
 			}
+			methodList := UnorderedList(strings.Join(methods, ""))
+			routeListItems[ri] = ListItem(rt.Pattern + "<br />" + methodList)
 		}
 	}
+	routeList := UnorderedList(strings.Join(routeListItems, ""))
+	mu.RouteHTML = Head(3, "Middlewares") + Div(middleWaresList) + Head(3, "Routes") + Div(routeList)
 }
 
 func buildRoutesMap(mu *MarkupDoc, parentPattern string, ar, nr, dr *DocRouter) {
