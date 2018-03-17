@@ -28,6 +28,9 @@ type MarkupOpts struct {
 	// Intro text included at the top of the generated markdown file.
 	Intro string
 
+	// RouteText contains HTML generated from Route metadata
+	RouteText string
+
 	// ForceRelativeLinks to be relative even if they're not on github
 	ForceRelativeLinks bool
 
@@ -83,48 +86,9 @@ func (mu *MarkupDoc) Generate() error {
 }
 
 // WriteRoutes generates the string for the Routes
-func (mu *MarkupDoc) WriteRoutes() string {
+func (mu *MarkupDoc) WriteRoutes() {
+
 	mu.buf.WriteString(fmt.Sprintf("## Routes\n\n"))
-
-	var buildRoutesMap func(parentPattern string, ar, nr, dr *DocRouter)
-	buildRoutesMap = func(parentPattern string, ar, nr, dr *DocRouter) {
-
-		nr.Middlewares = append(nr.Middlewares, dr.Middlewares...)
-
-		for pat, rt := range dr.Routes {
-			pattern := parentPattern + pat
-
-			nr.Routes = DocRoutes{}
-
-			if rt.Router != nil {
-				nnr := &DocRouter{}
-				nr.Routes[pat] = DocRoute{
-					Pattern:  pat,
-					Handlers: rt.Handlers,
-					Router:   nnr,
-				}
-				buildRoutesMap(pattern, ar, nnr, rt.Router)
-
-			} else if len(rt.Handlers) > 0 {
-				nr.Routes[pat] = DocRoute{
-					Pattern:  pat,
-					Handlers: rt.Handlers,
-					Router:   nil,
-				}
-
-				// Remove the trailing slash if the handler is a subroute for "/"
-				routeKey := pattern
-				if pat == "/" && len(routeKey) > 1 {
-					routeKey = routeKey[:len(routeKey)-1]
-				}
-				mu.Routes[routeKey] = copyDocRouter(*ar)
-
-			} else {
-				panic("not possible")
-			}
-		}
-
-	}
 
 	// Build a route tree that consists of the full route pattern
 	// and the part of the tree for just that specific route, stored
@@ -132,47 +96,7 @@ func (mu *MarkupDoc) WriteRoutes() string {
 	// are going to render to markdown.
 	dr := mu.Doc.Router
 	ar := DocRouter{}
-	buildRoutesMap("", &ar, &ar, &dr)
-
-	// Generate the markdown to render the above structure
-	var printRouter func(depth int, dr DocRouter)
-	printRouter = func(depth int, dr DocRouter) {
-
-		tabs := ""
-		for i := 0; i < depth; i++ {
-			tabs += "&tab;"
-		}
-
-		// Middlewares
-		middleWares := make([]string, len(dr.Middlewares))
-		for j, mw := range dr.Middlewares {
-			middleWares[j] = ListItem(fmt.Sprintf("[%s](%s)", mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
-		}
-		//middleWaresList := HTMLUnorderedList(strings.Join(middleWares, ""))
-
-		//routeListItems := make([]string, len(dr.Routes))
-		// Routes
-		for _, rt := range dr.Routes {
-			mu.buf.WriteString(fmt.Sprintf("%s- **%s**\n", tabs, rt.Pattern))
-			//currPattern := rt.Pattern
-
-			if rt.Router != nil {
-				printRouter(depth+1, *rt.Router)
-			} else {
-				for meth, dh := range rt.Handlers {
-					mu.buf.WriteString(fmt.Sprintf("%s\t- _%s_\n", tabs, meth))
-
-					// Handler middlewares
-					for _, mw := range dh.Middlewares {
-						mu.buf.WriteString(fmt.Sprintf("%s\t\t- [%s](%s)\n", tabs, mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
-					}
-
-					// Handler endpoint
-					mu.buf.WriteString(fmt.Sprintf("%s\t\t- [%s](%s)\n", tabs, dh.Func, mu.githubSourceURL(dh.File, dh.Line)))
-				}
-			}
-		}
-	}
+	buildRoutesMap(mu, "", &ar, &ar, &dr)
 
 	routePaths := []string{}
 	for pat := range mu.Routes {
@@ -185,7 +109,7 @@ func (mu *MarkupDoc) WriteRoutes() string {
 		mu.buf.WriteString(fmt.Sprintf("<details>\n"))
 		mu.buf.WriteString(fmt.Sprintf("<summary>`%s`</summary>\n", pat))
 		mu.buf.WriteString(fmt.Sprintf("\n"))
-		printRouter(0, dr)
+		printRouter(mu, 0, dr)
 		mu.buf.WriteString(fmt.Sprintf("\n"))
 		mu.buf.WriteString(fmt.Sprintf("</details>\n"))
 	}
@@ -194,7 +118,83 @@ func (mu *MarkupDoc) WriteRoutes() string {
 	mu.buf.WriteString(fmt.Sprintf("Total # of routes: %d\n", len(mu.Routes)))
 
 	// TODO: total number of handlers..
-	return "oops"
+	//return "oops"
+}
+
+// Generate the markdown to render the above structure
+func printRouter(mu *MarkupDoc, depth int, dr DocRouter) {
+
+	tabs := ""
+	for i := 0; i < depth; i++ {
+		tabs += "&tab;"
+	}
+
+	// Middlewares
+	middleWares := make([]string, len(dr.Middlewares))
+	for j, mw := range dr.Middlewares {
+		middleWares[j] = ListItem(fmt.Sprintf("[%s](%s)", mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
+	}
+	//middleWaresList := HTMLUnorderedList(strings.Join(middleWares, ""))
+
+	//routeListItems := make([]string, len(dr.Routes))
+	// Routes
+	for _, rt := range dr.Routes {
+		mu.buf.WriteString(fmt.Sprintf("%s- **%s**\n", tabs, rt.Pattern))
+		//currPattern := rt.Pattern
+
+		if rt.Router != nil {
+			printRouter(mu, depth+1, *rt.Router)
+		} else {
+			for meth, dh := range rt.Handlers {
+				mu.buf.WriteString(fmt.Sprintf("%s\t- _%s_\n", tabs, meth))
+
+				// Handler middlewares
+				for _, mw := range dh.Middlewares {
+					mu.buf.WriteString(fmt.Sprintf("%s\t\t- [%s](%s)\n", tabs, mw.Func, mu.githubSourceURL(mw.File, mw.Line)))
+				}
+
+				// Handler endpoint
+				mu.buf.WriteString(fmt.Sprintf("%s\t\t- [%s](%s)\n", tabs, dh.Func, mu.githubSourceURL(dh.File, dh.Line)))
+			}
+		}
+	}
+}
+
+func buildRoutesMap(mu *MarkupDoc, parentPattern string, ar, nr, dr *DocRouter) {
+	nr.Middlewares = append(nr.Middlewares, dr.Middlewares...)
+
+	for pat, rt := range dr.Routes {
+		pattern := parentPattern + pat
+
+		nr.Routes = DocRoutes{}
+
+		if rt.Router != nil {
+			nnr := &DocRouter{}
+			nr.Routes[pat] = DocRoute{
+				Pattern:  pat,
+				Handlers: rt.Handlers,
+				Router:   nnr,
+			}
+			buildRoutesMap(mu, pattern, ar, nnr, rt.Router)
+
+		} else if len(rt.Handlers) > 0 {
+			nr.Routes[pat] = DocRoute{
+				Pattern:  pat,
+				Handlers: rt.Handlers,
+				Router:   nil,
+			}
+
+			// Remove the trailing slash if the handler is a subroute for "/"
+			routeKey := pattern
+			if pat == "/" && len(routeKey) > 1 {
+				routeKey = routeKey[:len(routeKey)-1]
+			}
+			mu.Routes[routeKey] = copyDocRouter(*ar)
+
+		} else {
+			panic("not possible")
+		}
+	}
 }
 
 func (mu *MarkupDoc) githubSourceURL(file string, line int) string {
