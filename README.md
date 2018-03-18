@@ -1,4 +1,5 @@
 # docgen
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/forrest321/docgen)](https://goreportcard.com/report/github.com/forrest321/docgen)
 
 Auto-generate routing documentation in JSON, Markdown, or Markup (HTML) for a `chi` Router from your app source.
@@ -7,10 +8,11 @@ Auto-generate routing documentation in JSON, Markdown, or Markup (HTML) for a `c
 * Vendoring with [github.com/tools/godep](https://github.com/tools/godep)
 * Using Go [.gitignore Template](https://github.com/github/gitignore/blob/master/Go.gitignore)
 
-## fork info:
+## fork info
 
-In Process: 
-* Building HTML generation with optional web server  
+In Process
+
+* Building HTML generation with optional web server
   * Templates built, passing tests
   * HTML Generator is being built, not yet functional (3/18/2018)
     * 85% complete
