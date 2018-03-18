@@ -4,14 +4,17 @@ import "testing"
 
 func TestBaseTemplate(t *testing.T) {
 	tests := []struct {
-		name string
-		want string
+		name       string
+		want       string
+		expectFail bool
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
+		{"baseTest", BaseTemplate(), false},
+		{"failBlank", "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := BaseTemplate(); got != tt.want {
+			if got := BaseTemplate(); got != tt.want && !tt.expectFail {
 				t.Errorf("BaseTemplate() = %v, want %v", got, tt.want)
 			}
 		})
@@ -23,15 +26,17 @@ func TestUnorderedList(t *testing.T) {
 		listItems string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name       string
+		args       args
+		want       string
+		expectFail bool
 	}{
-	// TODO: Add test cases.
+		{"unorderedListTest", args{"<li>test</li>"}, UnorderedList(ListItem("test")), false},
+		{"failBlank", args{"<li>test</li>"}, "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := UnorderedList(tt.args.listItems); got != tt.want {
+			if got := UnorderedList(tt.args.listItems); got != tt.want && !tt.expectFail {
 				t.Errorf("UnorderedList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -43,15 +48,17 @@ func TestOrderedList(t *testing.T) {
 		listItems string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name       string
+		args       args
+		want       string
+		expectFail bool
 	}{
-	// TODO: Add test cases.
+		{"orderedListTest", args{"<li>test</li>"}, OrderedList(ListItem("test")), false},
+		{"failBlank", args{"<li>test</li>"}, "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := OrderedList(tt.args.listItems); got != tt.want {
+			if got := OrderedList(tt.args.listItems); got != tt.want && !tt.expectFail {
 				t.Errorf("OrderedList() = %v, want %v", got, tt.want)
 			}
 		})
@@ -67,7 +74,7 @@ func TestListItem(t *testing.T) {
 		args args
 		want string
 	}{
-	// TODO: Add test cases.
+		{"baseListItem", args{"test"}, "<li>test</li>"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -87,7 +94,7 @@ func TestDiv(t *testing.T) {
 		args args
 		want string
 	}{
-	// TODO: Add test cases.
+		{"baseDivTest", args{"test"}, "<div>test</div>"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -107,7 +114,7 @@ func TestP(t *testing.T) {
 		args args
 		want string
 	}{
-	// TODO: Add test cases.
+		{"basePTest", args{"test"}, "<p>test</p>"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -128,7 +135,7 @@ func TestHead(t *testing.T) {
 		args args
 		want string
 	}{
-	// TODO: Add test cases.
+		{"baseHeadTest", args{1, "test"}, "<h1>test</h1>"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -144,7 +151,7 @@ func TestMilligramMinCSS(t *testing.T) {
 		name string
 		want string
 	}{
-	// TODO: Add test cases.
+		{"baseCssTest", MilligramMinCSS()},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -160,7 +167,7 @@ func TestFaviconIcoData(t *testing.T) {
 		name string
 		want string
 	}{
-	// TODO: Add test cases.
+		{"baseFaviconTest", FaviconIcoData()},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
