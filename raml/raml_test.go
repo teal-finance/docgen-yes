@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/forrest321/docgen"
+	"github.com/forrest321/docgen/raml"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/docgen"
-	"github.com/go-chi/docgen/raml"
 	"github.com/go-chi/render"
 	yaml "gopkg.in/yaml.v2"
 )

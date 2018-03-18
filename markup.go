@@ -19,7 +19,7 @@ type MarkupDoc struct {
 	FormattedHTML string
 	RouteHTML     string
 
-	buf *bytes.Buffer
+	Buf *bytes.Buffer
 }
 
 // MarkupOpts describes the options for a MarkupDoc
@@ -49,10 +49,10 @@ type MarkupOpts struct {
 	HTTPServerPort int
 }
 
-// MarkupRoutesDoc builds a document based on routes in a given router
+// MarkupRoutesDoc builds a document based on routes in a given router with given option set
 func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 	mu := &MarkupDoc{Router: r, Opts: opts}
-	if err := mu.generate(); err != nil {
+	if err := mu.Generate(); err != nil {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}
 	return mu.String()
@@ -63,8 +63,8 @@ func (mu *MarkupDoc) String() string {
 	return mu.FormattedHTML
 }
 
-// generate builds the document
-func (mu *MarkupDoc) generate() error {
+// Generate builds the document
+func (mu *MarkupDoc) Generate() error {
 	if mu.Router == nil {
 		return errors.New("docgen: router is nil")
 	}
@@ -75,7 +75,7 @@ func (mu *MarkupDoc) generate() error {
 	}
 
 	mu.Doc = doc
-	mu.buf = &bytes.Buffer{}
+	mu.Buf = &bytes.Buffer{}
 	mu.Routes = make(map[string]DocRouter)
 
 	mu.writeRoutes()
@@ -97,7 +97,7 @@ func (mu *MarkupDoc) generate() error {
 // writeRoutes generates the string for the Routes
 func (mu *MarkupDoc) writeRoutes() {
 	routesHeader := Head(2, "Routes")
-	mu.buf.WriteString(routesHeader)
+	mu.Buf.WriteString(routesHeader)
 
 	// Build a route tree that consists of the full route pattern
 	// and the part of the tree for just that specific route, stored
@@ -115,16 +115,16 @@ func (mu *MarkupDoc) writeRoutes() {
 
 	for _, pat := range routePaths {
 		dr := mu.Routes[pat]
-		mu.buf.WriteString(fmt.Sprintf("<details>\n"))
-		mu.buf.WriteString(fmt.Sprintf("<summary>`%s`</summary>\n", pat))
+		mu.Buf.WriteString(fmt.Sprintf("<details>\n"))
+		mu.Buf.WriteString(fmt.Sprintf("<summary>`%s`</summary>\n", pat))
 
 		printRouter(mu, 0, dr)
 
-		mu.buf.WriteString(fmt.Sprintf("</details>\n"))
+		mu.Buf.WriteString(fmt.Sprintf("</details>\n"))
 	}
 
-	mu.buf.WriteString(fmt.Sprintf("\n"))
-	mu.buf.WriteString(fmt.Sprintf("Total # of routes: %d\n", len(mu.Routes)))
+	mu.Buf.WriteString(fmt.Sprintf("\n"))
+	mu.Buf.WriteString(fmt.Sprintf("Total # of routes: %d\n", len(mu.Routes)))
 
 	// TODO: total number of handlers..
 	//return "oops"
@@ -167,7 +167,7 @@ func printRouter(mu *MarkupDoc, depth int, dr DocRouter) {
 
 				// Handler endpoint
 				handlerEndpoint := fmt.Sprintf("[%s](%s)", dh.Func, mu.githubSourceURL(dh.File, dh.Line))
-				mu.buf.WriteString(handlerEndpoint)
+				mu.Buf.WriteString(handlerEndpoint)
 
 				methods[mi] = ListItem(meth + " " + handlerEndpoint + "<br />" + Div(innerMiddlesList))
 			}

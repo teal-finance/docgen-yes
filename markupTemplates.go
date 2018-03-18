@@ -2,6 +2,7 @@ package docgen
 
 import (
 	"strconv"
+	"strings"
 )
 
 // BaseTemplate is a basic html page with placeholders for: {title}, {css}, {intro}, and {routes}
@@ -54,15 +55,29 @@ func Div(text string) string {
 	return "<div>" + text + "</div>"
 }
 
-// Par wraps the string with <p> tags
-func Par(text string) string {
+// P wraps the string with <p> tags
+func P(text string) string {
 	return "<p>" + text + "</p>"
 }
 
 // Head creates a header for a given level eg H1, H2, H3...
 func Head(level int, text string) string {
-	lvl := "h" + strconv.Itoa(level)
-	return "<" + lvl + ">" + text + "</" + lvl + ">"
+	if len(strings.TrimSpace(text)) == 0 {
+		//no text, no header
+		return ""
+	}
+	lvl := strconv.Itoa(level)
+	//only H1, H2, H3, H4, H5, H6 are valid.
+	//if the level passed in is below 1, use 1
+	//if it is above 6, use 6
+	if level < 1 {
+		lvl = "1"
+	} else if level > 6 {
+		lvl = "6"
+	}
+	lvl = "h" + lvl
+	header := "<" + lvl + ">" + text + "</" + lvl + ">"
+	return header
 }
 
 // MilligramMinCSS is a tiny CSS kit, minimized and stringified here

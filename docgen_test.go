@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/forrest321/docgen"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/docgen"
 )
 
 // RequestID comment goes here.
@@ -174,8 +174,42 @@ func TestMuxBig(t *testing.T) {
 		})
 	})
 
-	fmt.Println(docgen.JSONRoutesDoc(r))
+	fmt.Printf("Done setting up chi.Router")
+}
 
-	// docgen.PrintRoutes(r)
+func TestPrintRoutes(t *testing.T) {
+	type args struct {
+		r chi.Routes
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			docgen.PrintRoutes(tt.args.r)
+		})
+	}
+}
 
+func TestJSONRoutesDoc(t *testing.T) {
+	type args struct {
+		r chi.Routes
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := docgen.JSONRoutesDoc(tt.args.r); got != tt.want {
+				t.Errorf("JSONRoutesDoc() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
