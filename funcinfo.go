@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+//FuncInfo describes a function's metadata
 type FuncInfo struct {
 	Pkg          string `json:"pkg"`
 	Func         string `json:"func"`
@@ -20,6 +21,7 @@ type FuncInfo struct {
 	Unresolvable bool   `json:"unresolvable,omitempty"`
 }
 
+//GetFuncInfo returns a FuncInfo object for a given interface
 func GetFuncInfo(i interface{}) FuncInfo {
 	fi := FuncInfo{}
 	frame := getCallerFrame(i)

@@ -1,8 +1,118 @@
 package docgen
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestBaseTemplate(t *testing.T) {
+	fmt.Println("Testing Base Template")
+
+	//check Base Template for expected template fields: {title}, {css}, {favicon.ico}, {intro}, {routes}
+	expectedFields := []string{"{title}", "{css}", "{favicon.ico}", "{intro}", "{routes}"}
+	bt := BaseTemplate()
+	for _, field := range expectedFields {
+		assert.True(t, strings.Contains(bt, field))
+	}
+
+	fmt.Println("Base Template Testing Complete")
+}
+
+func TestListItem(t *testing.T) {
+	fmt.Println("Testing List Item")
+
+	itemText := "test"
+	li := ListItem(itemText)
+	assert.True(t, strings.Contains(li, "<li>"))
+	assert.True(t, strings.Contains(li, "</li>"))
+	assert.True(t, strings.Contains(li, itemText))
+
+	fmt.Println("List Item Testing Complete")
+}
+
+func TestOrderedList(t *testing.T) {
+	fmt.Println("Testing Ordered List")
+
+	li := ListItem("test")
+	ol := OrderedList(li)
+
+	assert.True(t, strings.Contains(ol, "<ol>"))
+	assert.True(t, strings.Contains(ol, "</ol>"))
+	assert.True(t, strings.Contains(ol, li))
+
+	fmt.Println("Ordered List Testing Complete")
+}
+
+func TestUnorderedList(t *testing.T) {
+	fmt.Println("Testing Unordered List")
+
+	li := ListItem("test")
+	ul := UnorderedList(li)
+
+	assert.True(t, strings.Contains(ul, "<ul>"))
+	assert.True(t, strings.Contains(ul, "</ul>"))
+	assert.True(t, strings.Contains(ul, li))
+
+	fmt.Println("Ordered List Testing Complete")
+}
+
+func TestDiv(t *testing.T) {
+	fmt.Println("Testing Div")
+	testString := "test"
+	div := Div(testString)
+	assert.True(t, strings.Contains(div, "<div>"))
+	assert.True(t, strings.Contains(div, "</div>"))
+	assert.True(t, strings.Contains(div, testString))
+	fmt.Println("Div Testing Complete")
+}
+
+func TestP(t *testing.T) {
+	fmt.Println("Testing P")
+	testString := "test"
+	p := P(testString)
+	assert.True(t, strings.Contains(p, "<p>"))
+	assert.True(t, strings.Contains(p, "</p>"))
+	assert.True(t, strings.Contains(p, testString))
+	fmt.Println("P Testing Complete")
+}
+
+func TestHeading(t *testing.T) {
+	fmt.Println("Testing Headings")
+	testString := "test"
+
+	//h1 - h6 are valid
+	for index := 1; index <= 6; index++ {
+		h := Head(index, testString)
+
+		headerOpenTag := fmt.Sprintf("<h%v>", index)
+		headerCloseTag := fmt.Sprintf("</h%v>", index)
+
+		assert.True(t, strings.Contains(h, headerOpenTag))
+		assert.True(t, strings.Contains(h, headerCloseTag))
+		assert.True(t, strings.Contains(h, testString))
+	}
+
+	//anything below 1 should return an h1 tag
+	hzero := Head(0, "zero | should return h1")
+	assert.True(t, strings.Contains(hzero, "<h1>"))
+	//anything above 6 should return an h6 tag
+	hseven := Head(7, "seven | should return h6")
+	assert.True(t, strings.Contains(hseven, "<h6>"))
+
+	fmt.Println("Heading Testing Complete")
+}
+
+func TestCSS(t *testing.T) {
+	//MilligramMinCSS
+	css := MilligramMinCSS()
+	assert.NotNil(t, css)
+	//TODO: test CSS better?
+}
+
+func TestBaseTemplate1(t *testing.T) {
 	tests := []struct {
 		name       string
 		want       string
@@ -21,7 +131,7 @@ func TestBaseTemplate(t *testing.T) {
 	}
 }
 
-func TestUnorderedList(t *testing.T) {
+func TestUnorderedList1(t *testing.T) {
 	type args struct {
 		listItems string
 	}
@@ -43,7 +153,7 @@ func TestUnorderedList(t *testing.T) {
 	}
 }
 
-func TestOrderedList(t *testing.T) {
+func TestOrderedList1(t *testing.T) {
 	type args struct {
 		listItems string
 	}
@@ -65,7 +175,7 @@ func TestOrderedList(t *testing.T) {
 	}
 }
 
-func TestListItem(t *testing.T) {
+func TestListItem1(t *testing.T) {
 	type args struct {
 		text string
 	}
@@ -85,7 +195,7 @@ func TestListItem(t *testing.T) {
 	}
 }
 
-func TestDiv(t *testing.T) {
+func TestDiv1(t *testing.T) {
 	type args struct {
 		text string
 	}
@@ -105,7 +215,7 @@ func TestDiv(t *testing.T) {
 	}
 }
 
-func TestP(t *testing.T) {
+func TestP1(t *testing.T) {
 	type args struct {
 		text string
 	}
