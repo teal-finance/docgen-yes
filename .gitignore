@@ -16,4 +16,6 @@
 .env
 
 # Do we need these?
-# .vendor
+.vendor
+.vscode
+.directory
