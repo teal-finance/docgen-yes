@@ -17,8 +17,6 @@ type MarkupDoc struct {
 	Routes        map[string]DocRouter // Pattern : DocRouter
 	FormattedHTML string
 	RouteHTML     string
-
-	//Buf *bytes.Buffer
 }
 
 // MarkupOpts describes the options for a MarkupDoc
@@ -40,12 +38,6 @@ type MarkupOpts struct {
 	// For example:
 	// map[string]string{"github.com/my/package/vendor/go-chi/chi/": "https://github.com/go-chi/chi/blob/master/"}
 	URLMap map[string]string
-
-	// RunHTTPServer determines if the generated HTML will be hosted on a server //TODO: web server import (quickweb)
-	RunHTTPServer bool
-
-	// HTTPServerPort determines the numerical port for the web server
-	HTTPServerPort int
 }
 
 // MarkupRoutesDoc builds a document based on routes in a given router with given option set
@@ -62,28 +54,6 @@ func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 	}
 
 	formattedHTML := mu.String()
-	/*
-		* //TODO: fix for testing? HTML is wrong, but well formed :)
-		if opts.RunHTTPServer == true {
-			//spawn a quick web server on given port (default 8080), that accepts only a string - formattedHtml
-			optweb := chi.NewRouter()
-			optweb.Get("/", func(w http.ResponseWriter, r *http.Request) {
-				buf := &bytes.Buffer{}
-				buf.WriteString(formattedHTML)
-				w.WriteHeader(200)
-				w.Write(buf.Bytes())
-			})
-
-			port := opts.HTTPServerPort
-			if port < 1 || port > 9999 {
-				port = 8080
-			}
-			url := fmt.Sprintf("http://localhost:%v", port)
-			fmt.Println(fmt.Sprintf("Starting Server at http://localhost:%v", port))
-			http.ListenAndServe(fmt.Sprintf(":%v", port), r)
-			browser.OpenURL(url)
-		}*/
-
 	return formattedHTML
 }
 

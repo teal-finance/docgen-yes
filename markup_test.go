@@ -70,7 +70,7 @@ func TestMarkupDoc_String(t *testing.T) {
 }
 
 func buildOptions() *docgen.MarkupOpts {
-	return &docgen.MarkupOpts{RunHTTPServer: true, HTTPServerPort: 8080}
+	return &docgen.MarkupOpts{}
 }
 
 func setupRouter() chi.Router {
