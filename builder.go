@@ -120,7 +120,7 @@ func buildFuncInfo(i interface{}) FuncInfo {
 	}
 
 	if !fi.Unresolvable {
-		fi.Comment = getFuncComment(frame.File, frame.Line)
+		fi.Comment = getFuncComment(i, frame.File, frame.Line)
 	}
 
 	return fi
