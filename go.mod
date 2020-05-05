@@ -1,4 +1,4 @@
-module github.com/go-chi/docgen
+module github.com/trhura/docgen
 
 require (
 	github.com/go-chi/chi v4.0.0+incompatible
