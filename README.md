@@ -1,6 +1,6 @@
-# `docgen-yes`
+# `docgen`
 
-Fork of `docgen` where all PRs are welcome.
+*This Git repo is a fork of `docgen` where all PRs are welcome.*
 
 Auto-generate routing documentation in JSON, Markdown, or HTML (Markup) for a `chi` Router from your app source.
 
