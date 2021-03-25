@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"testing"
 
@@ -163,13 +162,13 @@ func adminRouter() chi.Router {
 	r := chi.NewRouter()
 	r.Use(AdminOnly)
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("admin: index"))
+		_, _ = w.Write([]byte("admin: index"))
 	})
 	r.Get("/accounts", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("admin: list accounts.."))
+		_, _ = w.Write([]byte("admin: list accounts.."))
 	})
 	r.Get("/users/:userId", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(fmt.Sprintf("admin: view user id %v", chi.URLParam(r, "userId"))))
+		_, _ = w.Write([]byte(fmt.Sprintf("admin: view user id %v", chi.URLParam(r, "userId"))))
 	})
 	return r
 }
@@ -198,27 +197,10 @@ func paginate(next http.Handler) http.Handler {
 
 //--
 
-// Below are a bunch of helper functions that mock some kind of storage
-
-func dbNewArticle(article *Article) (string, error) {
-	article.ID = fmt.Sprintf("%d", rand.Intn(100)+10)
-	articles = append(articles, article)
-	return article.ID, nil
-}
-
+// dbGetArticle is a helper function that mock some kind of storage
 func dbGetArticle(id string) (*Article, error) {
 	for _, a := range articles {
 		if a.ID == id {
-			return a, nil
-		}
-	}
-	return nil, errors.New("article not found.")
-}
-
-func dbRemoveArticle(id string) (*Article, error) {
-	for i, a := range articles {
-		if a.ID == id {
-			articles = append((articles)[:i], (articles)[i+1:]...)
 			return a, nil
 		}
 	}
