@@ -3,6 +3,7 @@ package docgen
 import (
 	"go/parser"
 	"go/token"
+	"net/http"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -60,14 +61,30 @@ func GetFuncInfo(i interface{}) FuncInfo {
 	}
 
 	if !fi.Unresolvable {
-		fi.Comment = getFuncComment(frame.File, frame.Line)
+		fi.Comment = getFuncComment(i, frame.File, frame.Line)
 	}
 
 	return fi
 }
 
 func getCallerFrame(i interface{}) *runtime.Frame {
-	pc := reflect.ValueOf(i).Pointer()
+	var val = reflect.ValueOf(i)
+	var pc uintptr
+
+	switch val.Kind() {
+	case reflect.Func:
+		pc = val.Pointer()
+	case reflect.Ptr:
+		var typ = reflect.TypeOf(i)
+		var handlerType = reflect.TypeOf(new(http.Handler)).Elem()
+
+		if typ.Implements(handlerType) {
+			if method, ok := typ.Elem().MethodByName("ServeHTTP"); ok {
+				pc = method.Func.Pointer()
+			}
+		}
+	}
+
 	frames := runtime.CallersFrames([]uintptr{pc})
 	if frames == nil {
 		return nil
@@ -91,7 +108,7 @@ func getPkgName(file string) string {
 	return astFile.Name.Name
 }
 
-func getFuncComment(file string, line int) string {
+func getFuncComment(i interface{}, file string, line int) string {
 	fset := token.NewFileSet()
 
 	astFile, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
@@ -101,6 +118,14 @@ func getFuncComment(file string, line int) string {
 
 	if len(astFile.Comments) == 0 {
 		return ""
+	}
+	typNames := strings.Split(reflect.TypeOf(i).String(), ".")
+	typName := typNames[len(typNames)-1]
+
+	for _, cmt := range astFile.Comments {
+		if strings.HasPrefix(cmt.Text(), typName+" ") {
+			return cmt.Text()
+		}
 	}
 
 	for _, cmt := range astFile.Comments {
