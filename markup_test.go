@@ -11,24 +11,69 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// RequestID comment goes here.
-func RequestID(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), "requestID", "1")
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+func TestMarkupRoutesDoc(t *testing.T) {
+	type args struct {
+		r    chi.Router
+		opts docgen.MarkupOpts
+	}
+	tests := []struct {
+		name       string
+		args       args
+		want       string
+		expectFail bool
+	}{
+		{"baseMarkupRoutesDocTest", args{setupRouter(), *buildOptions()}, "will fail", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := docgen.MarkupRoutesDoc(tt.args.r, tt.args.opts); got != tt.want && !tt.expectFail {
+				t.Errorf("MarkupRoutesDoc() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
-func hubIndexHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	s := fmt.Sprintf("/hubs/%s reqid:%s session:%s",
-		chi.URLParam(r, "hubID"), ctx.Value("requestID"), ctx.Value("session.user"))
-	w.Write([]byte(s))
+func TestMarkupDoc_String(t *testing.T) {
+	type fields struct {
+		Opts          docgen.MarkupOpts
+		Router        chi.Router
+		Doc           docgen.Doc
+		Routes        map[string]docgen.DocRouter
+		FormattedHTML string
+		RouteHTML     string
+	}
+	tests := []struct {
+		name       string
+		fields     fields
+		want       string
+		expectFail bool
+	}{
+		{"baseMarkupToStringTest", fields{}, "will fail", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mu := &docgen.MarkupDoc{
+				Opts:          tt.fields.Opts,
+				Router:        tt.fields.Router,
+				Doc:           tt.fields.Doc,
+				Routes:        tt.fields.Routes,
+				FormattedHTML: tt.fields.FormattedHTML,
+				RouteHTML:     tt.fields.RouteHTML,
+				//				Buf:           tt.fields.buf,
+			}
+			if got := mu.String(); got != tt.want && !tt.expectFail {
+				t.Errorf("MarkupDoc.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
-// Generate docs for the MuxBig from chi/mux_test.go.
-func TestMuxBig(t *testing.T) {
-	// var sr1, sr2, sr3, sr4, sr5, sr6 *chi.Mux
+func buildOptions() *docgen.MarkupOpts {
+	return &docgen.MarkupOpts{}
+}
+
+func setupRouter() chi.Router {
+	// TODO: use mock?
 	var r, sr3 *chi.Mux
 	r = chi.NewRouter()
 	r.Use(RequestID)
@@ -87,14 +132,12 @@ func TestMuxBig(t *testing.T) {
 		})
 
 		r.Route("/hubs", func(r chi.Router) {
-			_ = r.(*chi.Mux) // sr1
 			r.Use(func(next http.Handler) http.Handler {
 				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					next.ServeHTTP(w, r)
 				})
 			})
 			r.Route("/{hubID}", func(r chi.Router) {
-				_ = r.(*chi.Mux) // sr2
 				r.Get("/", hubIndexHandler)
 				r.Get("/touch", func(w http.ResponseWriter, r *http.Request) {
 					ctx := r.Context()
@@ -111,7 +154,6 @@ func TestMuxBig(t *testing.T) {
 					w.Write([]byte(s))
 				})
 				sr3.Route("/{webhookID}", func(r chi.Router) {
-					_ = r.(*chi.Mux) // sr4
 					r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 						ctx := r.Context()
 						s := fmt.Sprintf("/hubs/%s/webhooks/%s reqid:%s session:%s", chi.URLParam(r, "hubID"),
@@ -139,7 +181,6 @@ func TestMuxBig(t *testing.T) {
 				// routes
 
 				r.Route("/posts", func(r chi.Router) {
-					_ = r.(*chi.Mux) // sr5
 					r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 						ctx := r.Context()
 						s := fmt.Sprintf("/hubs/%s/posts reqid:%s session:%s", chi.URLParam(r, "hubID"),
@@ -151,7 +192,6 @@ func TestMuxBig(t *testing.T) {
 		})
 
 		r.Route("/folders/", func(r chi.Router) {
-			_ = r.(*chi.Mux) // sr6
 			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 				ctx := r.Context()
 				s := fmt.Sprintf("/folders/ reqid:%s session:%s",
@@ -176,42 +216,5 @@ func TestMuxBig(t *testing.T) {
 		})
 	})
 
-	fmt.Printf("Done setting up chi.Router")
-}
-
-func TestPrintRoutes(t *testing.T) {
-	type args struct {
-		r chi.Routes
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			docgen.PrintRoutes(tt.args.r)
-		})
-	}
-}
-
-func TestJSONRoutesDoc(t *testing.T) {
-	type args struct {
-		r chi.Routes
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := docgen.JSONRoutesDoc(tt.args.r); got != tt.want {
-				t.Errorf("JSONRoutesDoc() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	return r
 }

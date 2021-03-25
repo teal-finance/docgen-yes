@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// FuncInfo describes a function's metadata.
 type FuncInfo struct {
 	Pkg          string `json:"pkg"`
 	Func         string `json:"func"`
@@ -21,6 +22,7 @@ type FuncInfo struct {
 	Unresolvable bool   `json:"unresolvable,omitempty"`
 }
 
+// GetFuncInfo returns a FuncInfo object for a given interface.
 func GetFuncInfo(i interface{}) FuncInfo {
 	fi := FuncInfo{}
 	frame := getCallerFrame(i)
@@ -68,15 +70,15 @@ func GetFuncInfo(i interface{}) FuncInfo {
 }
 
 func getCallerFrame(i interface{}) *runtime.Frame {
-	var val = reflect.ValueOf(i)
+	val := reflect.ValueOf(i)
 	var pc uintptr
 
 	switch val.Kind() {
 	case reflect.Func:
 		pc = val.Pointer()
 	case reflect.Ptr:
-		var typ = reflect.TypeOf(i)
-		var handlerType = reflect.TypeOf(new(http.Handler)).Elem()
+		typ := reflect.TypeOf(i)
+		handlerType := reflect.TypeOf(new(http.Handler)).Elem()
 
 		if typ.Implements(handlerType) {
 			if method, ok := typ.Elem().MethodByName("ServeHTTP"); ok {
