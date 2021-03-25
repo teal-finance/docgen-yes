@@ -138,7 +138,7 @@ func (md *MarkdownDoc) WriteRoutes() {
 
 		// Routes
 		for _, rt := range dr.Routes {
-			md.buf.WriteString(fmt.Sprintf("%s- **%s**\n", tabs, rt.Pattern))
+			md.buf.WriteString(fmt.Sprintf("%s- **%s**\n", tabs, normalizer(rt.Pattern)))
 
 			if rt.Router != nil {
 				printRouter(depth+1, *rt.Router)
@@ -203,4 +203,11 @@ func (md *MarkdownDoc) githubSourceURL(file string, line int) string {
 	}
 	// absolute
 	return fmt.Sprintf("https://%s#L%d", file, line)
+}
+
+func normalizer(s string) string {
+	if strings.Contains(s, "/*") {
+		return strings.Replace(s, "/*", "", -1)
+	}
+	return s
 }
