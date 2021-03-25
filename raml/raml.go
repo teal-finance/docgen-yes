@@ -41,10 +41,10 @@ type Resource struct {
 	Responses       Responses `yaml:"responses,omitempty"`
 	Body            Body      `yaml:"body,omitempty"`
 	Is              []string  `yaml:"is,omitempty"`
-	Type            string    `yaml:"type,omitempty"`
+	Example         string    `yaml:"example,omitempty"`
 	SecuredBy       []string  `yaml:"securedBy,omitempty"`
-	UriParameters   []string  `yaml:"uirParameters,omitempty"`
-	QueryParameters []string  `yaml:"queryParameters,omitempty"`
+	URIParameters   Body      `yaml:"uriParameters,omitempty"`
+	QueryParameters Body      `yaml:"queryParameters,omitempty"`
 
 	Resources `yaml:",inline"`
 }
@@ -58,7 +58,10 @@ type Response struct {
 type Body map[string]Example // Content-Type to Example
 
 type Example struct {
-	Example string `yaml:"example,omitempty"`
+	Example     string `yaml:"example,omitempty"`
+	Type        string `yaml:"type,omitempty"`
+	Description string `yaml:"description,omitempty"`
+	Required    bool   `yaml:"required,omitempty"`
 }
 
 func (r *RAML) Add(method string, route string, resource *Resource) error {
