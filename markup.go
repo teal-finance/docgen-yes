@@ -43,9 +43,9 @@ type MarkupOpts struct {
 // MarkupRoutesDoc builds a document based on routes in a given router with given option set.
 func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 	// Goal: rewrite this class to have a single exported function(?)
-	//		that returns a formatted HTML document based on a MarkupOpts
-	// 		1) flatten router, build docs w/o recursion
-	// 		2) Alternatively, build the JSON or Markdown doc and convert to HTML
+	//    that returns a formatted HTML document based on a MarkupOpts
+	//     1) flatten router, build docs w/o recursion
+	//     2) Alternatively, build the JSON or Markdown doc and convert to HTML
 
 	mu := &MarkupDoc{Router: r, Opts: opts}
 	if err := mu.generate(); err != nil {
@@ -73,7 +73,7 @@ func (mu *MarkupDoc) generate() error {
 	}
 
 	mu.Doc = doc
-	//	mu.Buf = &bytes.Buffer{}
+	//  mu.Buf = &bytes.Buffer{}
 	mu.Routes = make(map[string]DocRouter)
 
 	mu.writeRoutes()

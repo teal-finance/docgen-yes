@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"docgen"
+	"docgen-yes"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -59,7 +59,7 @@ func TestMarkupDoc_String(t *testing.T) {
 				Routes:        tt.fields.Routes,
 				FormattedHTML: tt.fields.FormattedHTML,
 				RouteHTML:     tt.fields.RouteHTML,
-				//				Buf:           tt.fields.buf,
+				//        Buf:           tt.fields.buf,
 			}
 			if got := mu.String(); got != tt.want && !tt.expectFail {
 				t.Errorf("MarkupDoc.String() = %v, want %v", got, tt.want)

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"testing"
 
-	"docgen"
-	"docgen/raml"
+	"docgen-yes"
+	"docgen-yes/raml"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -197,7 +197,7 @@ func paginate(next http.Handler) http.Handler {
 
 //--
 
-// dbGetArticle is a helper function that mock some kind of storage
+// dbGetArticle is a helper function that mock some kind of storage.
 func dbGetArticle(id string) (*Article, error) {
 	for _, a := range articles {
 		if a.ID == id {

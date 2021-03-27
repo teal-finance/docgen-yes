@@ -1,13 +1,49 @@
-# `docgen`
+# `docgen-yes`
 
-*This Git repo is a fork of `docgen` where all PRs are welcome.*
+This Git repo is a maintained fork of [`docgen`](https://github.com/go-chi/docgen). Here all PRs are welcome. The upstream `docgen` is more conservative.
 
-Auto-generate routing documentation in JSON, Markdown, or HTML (Markup) for a `chi` Router from your app source.
+The libraries `docgen` and `docgen-yes` both auto-generates routing documentation for a `chi` Router from your app source.
 
-See [an example use of the Markdown Generator](https://github.com/go-chi/chi/blob/master/_examples/rest/main.go#L105)
+## Differences
 
-![Example Screenshot](carbon.png)
-(code Screenshot made with [Carbon](https://carbon.now.sh))
+The upstream `docgen` is very stable, while `docgen-yes` includes experimental new features.
+
+Generator  | `docgen` | `docgen-yes`
+-----------|----------|--------------
+JSON       | ✔ Stable | ✔ Minor enahcements
+Markdown   | ✔ Stable | ✔ Minor enahcements
+HTML       | ✖        | ✔ Experimental
+
+## Example
+
+[Example use of the JSON and Markdown generators](https://github.com/go-chi/chi/blob/master/_examples/rest/main.go#L105).
+
+![Example Screenshot](carbon.webp)
+(screenshot made with [Carbon](https://carbon.now.sh) and retouched with [GIMP](https://en.wikipedia.org/wiki/GIMP))
+
+## `import`
+
+### Upstream `docgen`
+
+```go
+import (
+  "net/http"
+
+  "github.com/go-chi/chi/v5"
+  "github.com/go-chi/docgen"
+)
+```
+
+### To use this fork
+
+```go
+import (
+  "net/http"
+
+  "github.com/go-chi/chi/v5"
+  "github.com/micheartin/docgen-yes" // note the change
+)
+```
 
 ## Experimental HTML generator
 
@@ -18,6 +54,7 @@ See [an example use of the Markdown Generator](https://github.com/go-chi/chi/blo
 * Configuration obj
 * New code inspired from markdown.go
 * See markup.go and markupTemplates.go
+* Designed & implemented by [forrest321](https://github.com/forrest321/docgen)
 
 ## Build
 
