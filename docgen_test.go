@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"docgen-yes"
+	"github.com/micheartin/docgen-yes"
 
 	"github.com/go-chi/chi/v5"
 )

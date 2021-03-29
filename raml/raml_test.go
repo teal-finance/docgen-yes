@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"testing"
 
-	"docgen-yes"
-	"docgen-yes/raml"
+	"github.com/micheartin/docgen-yes/raml"
+	"github.com/micheartin/docgen-yes"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
