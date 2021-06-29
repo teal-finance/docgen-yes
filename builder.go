@@ -1,7 +1,6 @@
 package docgen
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
