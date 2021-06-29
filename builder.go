@@ -14,11 +14,6 @@ import (
 func BuildDoc(r chi.Routes) (Doc, error) {
 	d := Doc{}
 
-	goPath := os.Getenv("GOPATH")
-	if goPath == "" {
-		return d, errors.New("docgen: unable to determine your $GOPATH")
-	}
-
 	// Walk and generate the router docs
 	d.Router = buildDocRouter(r)
 	return d, nil
