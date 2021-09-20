@@ -63,6 +63,7 @@ func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 	}
 
 	formattedHTML := mu.String()
+
 	return formattedHTML
 }
 
@@ -227,14 +228,17 @@ func (mu *MarkupDoc) githubSourceURL(file string, line int) string {
 			pos := idx + len(pkg)
 			url = strings.TrimRight(url, "/")
 			filepath := strings.TrimLeft(file[pos:], "/")
+
 			return fmt.Sprintf("%s/%s#L%d", url, filepath, line)
 		}
 	}
 	if idx := strings.Index(file, mu.Opts.ProjectPath); idx >= 0 {
 		// relative
 		pos := idx + len(mu.Opts.ProjectPath)
+
 		return fmt.Sprintf("%s#L%d", file[pos:], line)
 	}
+
 	// absolute
 	return fmt.Sprintf("https://%s#L%d", file, line)
 }

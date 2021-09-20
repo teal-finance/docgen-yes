@@ -50,9 +50,18 @@ func TestMarkupDoc_String(t *testing.T) {
 		{
 			"baseMarkupToStringTest",
 			fields{
-				Opts:          docgen.MarkupOpts{},
-				Router:        nil,
-				Doc:           docgen.Doc{},
+				Opts: docgen.MarkupOpts{
+					ProjectPath:        "",
+					Intro:              "",
+					RouteText:          "",
+					ForceRelativeLinks: false,
+					URLMap:             map[string]string{},
+				},
+				Router: nil,
+				Doc: docgen.Doc{Router: docgen.DocRouter{
+					Middlewares: []docgen.DocMiddleware{},
+					Routes:      map[string]docgen.DocRoute{},
+				}},
 				Routes:        map[string]docgen.DocRouter{},
 				FormattedHTML: "",
 				RouteHTML:     "",
@@ -79,7 +88,13 @@ func TestMarkupDoc_String(t *testing.T) {
 }
 
 func buildOptions() *docgen.MarkupOpts {
-	return &docgen.MarkupOpts{}
+	return &docgen.MarkupOpts{
+		ProjectPath:        "",
+		Intro:              "",
+		RouteText:          "",
+		ForceRelativeLinks: false,
+		URLMap:             map[string]string{},
+	}
 }
 
 func setupRouter() chi.Router {

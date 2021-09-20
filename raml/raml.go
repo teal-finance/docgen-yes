@@ -158,8 +158,16 @@ func (r Resources) upsert(method string, route string, resource *Resource) error
 			node, found := currentNode[part]
 			if !found {
 				node = &Resource{
-					Resources: Resources{},
-					Responses: Responses{},
+					DisplayName:     "",
+					Description:     "",
+					Responses:       Responses{},
+					Body:            map[string]Example{},
+					Is:              []string{},
+					Example:         "",
+					SecuredBy:       []string{},
+					URIParameters:   map[string]Example{},
+					QueryParameters: map[string]Example{},
+					Resources:       Resources{},
 				}
 			}
 			currentNode[part] = node

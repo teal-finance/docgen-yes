@@ -115,6 +115,7 @@ func ArticleCtx(next http.Handler) http.Handler {
 		if err != nil {
 			render.Status(r, http.StatusNotFound)
 			render.JSON(w, r, http.StatusText(http.StatusNotFound))
+
 			return
 		}
 		ctx := context.WithValue(r.Context(), "article", article)
@@ -183,6 +184,7 @@ func adminRouter() chi.Router {
 	r.Get("/users/:userId", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(fmt.Sprintf("admin: view user id %v", chi.URLParam(r, "userId"))))
 	})
+
 	return r
 }
 
@@ -192,6 +194,7 @@ func AdminOnly(next http.Handler) http.Handler {
 		isAdmin, ok := r.Context().Value("acl.admin").(bool)
 		if !ok || !isAdmin {
 			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+
 			return
 		}
 		next.ServeHTTP(w, r)
@@ -217,5 +220,6 @@ func dbGetArticle(id string) (*Article, error) {
 			return a, nil
 		}
 	}
+
 	return nil, errors.New("article not found")
 }

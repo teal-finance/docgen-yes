@@ -8,7 +8,12 @@ import (
 )
 
 func BuildDoc(r chi.Routes) (Doc, error) {
-	d := Doc{}
+	d := Doc{
+		Router: DocRouter{
+			Middlewares: []DocMiddleware{},
+			Routes:      map[string]DocRoute{},
+		},
+	}
 
 	// Walk and generate the router docs
 	d.Router = buildDocRouter(r)
@@ -33,7 +38,14 @@ func buildDocRouter(r chi.Routes) DocRouter {
 	}
 
 	for _, rt := range rts.Routes() {
-		drt := DocRoute{Pattern: rt.Pattern, Handlers: DocHandlers{}}
+		drt := DocRoute{
+			Pattern:  rt.Pattern,
+			Handlers: DocHandlers{},
+			Router: &DocRouter{
+				Middlewares: []DocMiddleware{},
+				Routes:      map[string]DocRoute{},
+			},
+		}
 
 		if rt.SubRoutes != nil {
 			subRoutes := rt.SubRoutes
@@ -49,7 +61,15 @@ func buildDocRouter(r chi.Routes) DocRouter {
 				dh := DocHandler{
 					Middlewares: []DocMiddleware{},
 					Method:      method,
-					FuncInfo:    FuncInfo{},
+					FuncInfo: FuncInfo{
+						Pkg:          "",
+						Func:         "",
+						Comment:      "",
+						File:         "",
+						Line:         0,
+						Anonymous:    false,
+						Unresolvable: false,
+					},
 				}
 
 				var endpoint http.Handler

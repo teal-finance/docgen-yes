@@ -42,6 +42,7 @@ func copyDocRouter(dr DocRouter) DocRouter {
 		cr.Middlewares = make([]DocMiddleware, len(dr.Middlewares))
 		copy(cr.Middlewares, dr.Middlewares)
 		cr.Routes = cloneRoutes(dr.Routes)
+
 		return cr
 	}
 

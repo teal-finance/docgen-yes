@@ -77,6 +77,7 @@ func Head(level int, text string) string {
 	}
 	lvl = "h" + lvl
 	header := "<" + lvl + ">" + text + "</" + lvl + ">"
+
 	return header
 }
 

@@ -40,13 +40,17 @@ func MarkdownRoutesDoc(r chi.Router, opts MarkdownOpts) string {
 	md := &MarkdownDoc{
 		Opts:   opts,
 		Router: r,
-		Doc:    Doc{},
+		Doc: Doc{Router: DocRouter{
+			Middlewares: []DocMiddleware{},
+			Routes:      map[string]DocRoute{},
+		}},
 		Routes: map[string]DocRouter{},
 		buf:    &bytes.Buffer{},
 	}
 	if err := md.Generate(); err != nil {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}
+
 	return md.String()
 }
 
@@ -205,12 +209,14 @@ func (md *MarkdownDoc) githubSourceURL(file string, line int) string {
 			pos := idx + len(pkg)
 			url = strings.TrimRight(url, "/")
 			filepath := strings.TrimLeft(file[pos:], "/")
+
 			return fmt.Sprintf("%s/%s#L%d", url, filepath, line)
 		}
 	}
 	if idx := strings.Index(file, md.Opts.ProjectPath); idx >= 0 {
 		// relative
 		pos := idx + len(md.Opts.ProjectPath)
+
 		return fmt.Sprintf("%s#L%d", file[pos:], line)
 	}
 	// absolute
@@ -221,5 +227,6 @@ func normalizer(s string) string {
 	if strings.Contains(s, "/*") {
 		return strings.ReplaceAll(s, "/*", "")
 	}
+
 	return s
 }

@@ -104,6 +104,7 @@ func getCallerFrame(i interface{}) *runtime.Frame {
 	if frame.Entry == 0 {
 		return nil
 	}
+
 	return &frame
 }
 
@@ -116,6 +117,7 @@ func getPkgName(file string) string {
 	if astFile.Name == nil {
 		return ""
 	}
+
 	return astFile.Name.Name
 }
 
