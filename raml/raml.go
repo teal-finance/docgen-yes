@@ -14,7 +14,7 @@ var header = `#%RAML 1.0
 
 type RAML struct {
 	Title         string          `yaml:"title,omitempty"`
-	BaseUri       string          `yaml:"baseUri,omitempty"`
+	BaseURI       string          `yaml:"baseUri,omitempty"`
 	Protocols     []string        `yaml:"protocols,omitempty"`
 	MediaType     string          `yaml:"mediaType,omitempty"`
 	Version       string          `yaml:"version,omitempty"`
@@ -25,6 +25,7 @@ type RAML struct {
 
 func (r *RAML) String() string {
 	bytes, _ := yaml.Marshal(r)
+
 	return fmt.Sprintf("%s%s", header, bytes)
 }
 
@@ -99,8 +100,16 @@ func (r *RAML) AddUnder(parentRoute string, method string, route string, resourc
 	parentNode, found := r.Resources[parentRoute]
 	if !found {
 		parentNode = &Resource{
-			Resources: Resources{},
-			Responses: Responses{},
+			DisplayName:     "",
+			Description:     "",
+			Responses:       Responses{},
+			Body:            map[string]Example{},
+			Is:              []string{},
+			Example:         "",
+			SecuredBy:       []string{},
+			URIParameters:   map[string]Example{},
+			QueryParameters: map[string]Example{},
+			Resources:       Resources{},
 		}
 		r.Resources[parentRoute] = parentNode
 	}
@@ -126,8 +135,16 @@ func (r Resources) upsert(method string, route string, resource *Resource) error
 			node, found := currentNode[part]
 			if !found {
 				node = &Resource{
-					Resources: Resources{},
-					Responses: Responses{},
+					DisplayName:     "",
+					Description:     "",
+					Responses:       Responses{},
+					Body:            map[string]Example{},
+					Is:              []string{},
+					Example:         "",
+					SecuredBy:       []string{},
+					URIParameters:   map[string]Example{},
+					QueryParameters: map[string]Example{},
+					Resources:       Resources{},
 				}
 
 				currentNode[part] = node

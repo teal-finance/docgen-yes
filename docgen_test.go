@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/micheartin/docgen-yes"
-
 	"github.com/go-chi/chi/v5"
+	"github.com/micheartin/docgen-yes"
 )
 
 // RequestID comment goes here.
@@ -176,7 +175,7 @@ func TestMuxBig(t *testing.T) {
 		})
 	})
 
-	fmt.Printf("Done setting up chi.Router")
+	t.Logf("Done setting up chi.Router")
 }
 
 func TestPrintRoutes(t *testing.T) {

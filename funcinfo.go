@@ -24,12 +24,21 @@ type FuncInfo struct {
 
 // GetFuncInfo returns a FuncInfo object for a given interface.
 func GetFuncInfo(i interface{}) FuncInfo {
-	fi := FuncInfo{}
+	fi := FuncInfo{
+		Pkg:          "",
+		Func:         "",
+		Comment:      "",
+		File:         "",
+		Line:         0,
+		Anonymous:    false,
+		Unresolvable: false,
+	}
 	frame := getCallerFrame(i)
 	goPathSrc := filepath.Join(os.Getenv("GOPATH"), "src")
 
 	if frame == nil {
 		fi.Unresolvable = true
+
 		return fi
 	}
 

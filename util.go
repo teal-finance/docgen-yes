@@ -1,14 +1,23 @@
 package docgen
 
 func copyDocRouter(dr DocRouter) DocRouter {
-	var cloneRouter func(dr DocRouter) DocRouter
-	var cloneRoutes func(drt DocRoutes) DocRoutes
+	var (
+		cloneRouter func(dr DocRouter) DocRouter
+		cloneRoutes func(drt DocRoutes) DocRoutes
+	)
 
 	cloneRoutes = func(drts DocRoutes) DocRoutes {
 		rts := DocRoutes{}
 
 		for pat, drt := range drts {
-			rt := DocRoute{Pattern: drt.Pattern}
+			rt := DocRoute{
+				Pattern:  drt.Pattern,
+				Handlers: map[string]DocHandler{},
+				Router: &DocRouter{
+					Middlewares: []DocMiddleware{},
+					Routes:      map[string]DocRoute{},
+				},
+			}
 			if len(drt.Handlers) > 0 {
 				rt.Handlers = DocHandlers{}
 				for meth, dh := range drt.Handlers {
@@ -26,7 +35,10 @@ func copyDocRouter(dr DocRouter) DocRouter {
 	}
 
 	cloneRouter = func(dr DocRouter) DocRouter {
-		cr := DocRouter{}
+		cr := DocRouter{
+			Middlewares: []DocMiddleware{},
+			Routes:      map[string]DocRoute{},
+		}
 		cr.Middlewares = make([]DocMiddleware, len(dr.Middlewares))
 		copy(cr.Middlewares, dr.Middlewares)
 		cr.Routes = cloneRoutes(dr.Routes)

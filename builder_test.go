@@ -53,7 +53,7 @@ func Test_buildDocRouter(t *testing.T) {
 	}
 }
 
-func Test_buildFuncInfo(t *testing.T) {
+func Test_GetFuncInfo(t *testing.T) {
 	type args struct {
 		i interface{}
 	}
@@ -66,8 +66,8 @@ func Test_buildFuncInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := buildFuncInfo(tt.args.i); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("buildFuncInfo() = %v, want %v", got, tt.want)
+			if got := GetFuncInfo(tt.args.i); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetFuncInfo() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func TestBaseTemplate(t *testing.T) {
-	fmt.Println("Testing Base Template")
+	t.Log("Testing Base Template")
 
 	// check Base Template for expected template fields: {title}, {css}, {favicon.ico}, {intro}, {routes}
 	expectedFields := []string{"{title}", "{css}", "{favicon.ico}", "{intro}", "{routes}"}
@@ -18,11 +18,11 @@ func TestBaseTemplate(t *testing.T) {
 		assert.True(t, strings.Contains(bt, field))
 	}
 
-	fmt.Println("Base Template Testing Complete")
+	t.Log("Base Template Testing Complete")
 }
 
 func TestListItem(t *testing.T) {
-	fmt.Println("Testing List Item")
+	t.Log("Testing List Item")
 
 	itemText := "test"
 	li := ListItem(itemText)
@@ -30,11 +30,11 @@ func TestListItem(t *testing.T) {
 	assert.True(t, strings.Contains(li, "</li>"))
 	assert.True(t, strings.Contains(li, itemText))
 
-	fmt.Println("List Item Testing Complete")
+	t.Log("List Item Testing Complete")
 }
 
 func TestOrderedList(t *testing.T) {
-	fmt.Println("Testing Ordered List")
+	t.Log("Testing Ordered List")
 
 	li := ListItem("test")
 	ol := OrderedList(li)
@@ -43,11 +43,11 @@ func TestOrderedList(t *testing.T) {
 	assert.True(t, strings.Contains(ol, "</ol>"))
 	assert.True(t, strings.Contains(ol, li))
 
-	fmt.Println("Ordered List Testing Complete")
+	t.Log("Ordered List Testing Complete")
 }
 
 func TestUnorderedList(t *testing.T) {
-	fmt.Println("Testing Unordered List")
+	t.Log("Testing Unordered List")
 
 	li := ListItem("test")
 	ul := UnorderedList(li)
@@ -56,31 +56,31 @@ func TestUnorderedList(t *testing.T) {
 	assert.True(t, strings.Contains(ul, "</ul>"))
 	assert.True(t, strings.Contains(ul, li))
 
-	fmt.Println("Ordered List Testing Complete")
+	t.Log("Ordered List Testing Complete")
 }
 
 func TestDiv(t *testing.T) {
-	fmt.Println("Testing Div")
+	t.Log("Testing Div")
 	testString := "test"
 	div := Div(testString)
 	assert.True(t, strings.Contains(div, "<div>"))
 	assert.True(t, strings.Contains(div, "</div>"))
 	assert.True(t, strings.Contains(div, testString))
-	fmt.Println("Div Testing Complete")
+	t.Log("Div Testing Complete")
 }
 
 func TestP(t *testing.T) {
-	fmt.Println("Testing P")
+	t.Log("Testing P")
 	testString := "test"
 	p := P(testString)
 	assert.True(t, strings.Contains(p, "<p>"))
 	assert.True(t, strings.Contains(p, "</p>"))
 	assert.True(t, strings.Contains(p, testString))
-	fmt.Println("P Testing Complete")
+	t.Log("P Testing Complete")
 }
 
 func TestHeading(t *testing.T) {
-	fmt.Println("Testing Headings")
+	t.Log("Testing Headings")
 	testString := "test"
 
 	// h1 - h6 are valid
@@ -102,7 +102,7 @@ func TestHeading(t *testing.T) {
 	hseven := Head(7, "seven | should return h6")
 	assert.True(t, strings.Contains(hseven, "<h6>"))
 
-	fmt.Println("Heading Testing Complete")
+	t.Log("Heading Testing Complete")
 }
 
 func TestCSS(t *testing.T) {

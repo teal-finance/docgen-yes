@@ -3,9 +3,6 @@ package docgen
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -15,18 +12,22 @@ func BuildDoc(r chi.Routes) (Doc, error) {
 
 	// Walk and generate the router docs
 	d.Router = buildDocRouter(r)
+
 	return d, nil
 }
 
 func buildDocRouter(r chi.Routes) DocRouter {
 	rts := r
-	dr := DocRouter{Middlewares: []DocMiddleware{}}
+	dr := DocRouter{
+		Middlewares: []DocMiddleware{},
+		Routes:      map[string]DocRoute{},
+	}
 	drts := DocRoutes{}
 	dr.Routes = drts
 
 	for _, mw := range rts.Middlewares() {
 		dmw := DocMiddleware{
-			FuncInfo: buildFuncInfo(mw),
+			FuncInfo: GetFuncInfo(mw),
 		}
 		dr.Middlewares = append(dr.Middlewares, dmw)
 	}
@@ -45,7 +46,11 @@ func buildDocRouter(r chi.Routes) DocRouter {
 					continue
 				}
 
-				dh := DocHandler{Method: method, Middlewares: []DocMiddleware{}}
+				dh := DocHandler{
+					Middlewares: []DocMiddleware{},
+					Method:      method,
+					FuncInfo:    FuncInfo{},
+				}
 
 				var endpoint http.Handler
 				chain, _ := h.(*chi.ChainHandler)
@@ -53,7 +58,7 @@ func buildDocRouter(r chi.Routes) DocRouter {
 				if chain != nil {
 					for _, mw := range chain.Middlewares {
 						dh.Middlewares = append(dh.Middlewares, DocMiddleware{
-							FuncInfo: buildFuncInfo(mw),
+							FuncInfo: GetFuncInfo(mw),
 						})
 					}
 					endpoint = chain.Endpoint
@@ -61,7 +66,7 @@ func buildDocRouter(r chi.Routes) DocRouter {
 					endpoint = h
 				}
 
-				dh.FuncInfo = buildFuncInfo(endpoint)
+				dh.FuncInfo = GetFuncInfo(endpoint)
 
 				drt.Handlers[method] = dh
 			}
@@ -71,50 +76,4 @@ func buildDocRouter(r chi.Routes) DocRouter {
 	}
 
 	return dr
-}
-
-func buildFuncInfo(i interface{}) FuncInfo {
-	fi := FuncInfo{}
-	frame := getCallerFrame(i)
-	goPathSrc := filepath.Join(os.Getenv("GOPATH"), "src")
-
-	if frame == nil {
-		fi.Unresolvable = true
-		return fi
-	}
-
-	pkgName := getPkgName(frame.File)
-	if pkgName == "chi" {
-		fi.Unresolvable = true
-	}
-	funcPath := frame.Func.Name()
-
-	idx := strings.Index(funcPath, "/"+pkgName)
-	if idx > 0 {
-		fi.Pkg = funcPath[:idx+1+len(pkgName)]
-		fi.Func = funcPath[idx+2+len(pkgName):]
-	} else {
-		fi.Func = funcPath
-	}
-
-	if strings.Index(fi.Func, ".func") > 0 {
-		fi.Anonymous = true
-	}
-
-	fi.File = frame.File
-	fi.Line = frame.Line
-	if filepath.HasPrefix(fi.File, goPathSrc) {
-		fi.File = fi.File[len(goPathSrc)+1:]
-	}
-
-	// Check if file info is unresolvable
-	if !strings.Contains(funcPath, pkgName) {
-		fi.Unresolvable = true
-	}
-
-	if !fi.Unresolvable {
-		fi.Comment = getFuncComment(i, frame.File, frame.Line)
-	}
-
-	return fi
 }

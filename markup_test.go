@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/micheartin/docgen-yes"
-
 	"github.com/go-chi/chi/v5"
+	"github.com/micheartin/docgen-yes"
 )
 
 func TestMarkupRoutesDoc(t *testing.T) {
@@ -48,7 +47,18 @@ func TestMarkupDoc_String(t *testing.T) {
 		want       string
 		expectFail bool
 	}{
-		{"baseMarkupToStringTest", fields{}, "will fail", true},
+		{
+			"baseMarkupToStringTest",
+			fields{
+				Opts:          docgen.MarkupOpts{},
+				Router:        nil,
+				Doc:           docgen.Doc{},
+				Routes:        map[string]docgen.DocRouter{},
+				FormattedHTML: "",
+				RouteHTML:     "",
+			},
+			"will fail", true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

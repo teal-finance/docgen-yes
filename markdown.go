@@ -37,7 +37,13 @@ type MarkdownOpts struct {
 }
 
 func MarkdownRoutesDoc(r chi.Router, opts MarkdownOpts) string {
-	md := &MarkdownDoc{Router: r, Opts: opts}
+	md := &MarkdownDoc{
+		Opts:   opts,
+		Router: r,
+		Doc:    Doc{},
+		Routes: map[string]DocRouter{},
+		buf:    &bytes.Buffer{},
+	}
 	if err := md.Generate(); err != nil {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}
@@ -89,7 +95,10 @@ func (md *MarkdownDoc) WriteRoutes() {
 			nr.Routes = DocRoutes{}
 
 			if rt.Router != nil {
-				nnr := &DocRouter{}
+				nnr := &DocRouter{
+					Middlewares: []DocMiddleware{},
+					Routes:      map[string]DocRoute{},
+				}
 				nr.Routes[pat] = DocRoute{
 					Pattern:  pat,
 					Handlers: rt.Handlers,
@@ -120,7 +129,10 @@ func (md *MarkdownDoc) WriteRoutes() {
 	// in routes map on the markdown struct. This is the structure we
 	// are going to render to markdown.
 	dr := md.Doc.Router
-	ar := DocRouter{}
+	ar := DocRouter{
+		Middlewares: []DocMiddleware{},
+		Routes:      map[string]DocRoute{},
+	}
 	buildRoutesMap("", &ar, &ar, &dr)
 
 	// Generate the markdown to render the above structure
@@ -207,7 +219,7 @@ func (md *MarkdownDoc) githubSourceURL(file string, line int) string {
 
 func normalizer(s string) string {
 	if strings.Contains(s, "/*") {
-		return strings.Replace(s, "/*", "", -1)
+		return strings.ReplaceAll(s, "/*", "")
 	}
 	return s
 }

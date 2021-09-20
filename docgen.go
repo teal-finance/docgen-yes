@@ -61,5 +61,6 @@ func JSONRoutesDoc(r chi.Routes) string {
 	if err != nil {
 		panic(err)
 	}
+
 	return string(v)
 }

@@ -47,7 +47,17 @@ func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 	//     1) flatten router, build docs w/o recursion
 	//     2) Alternatively, build the JSON or Markdown doc and convert to HTML
 
-	mu := &MarkupDoc{Router: r, Opts: opts}
+	mu := &MarkupDoc{
+		Opts:   opts,
+		Router: r,
+		Doc: Doc{Router: DocRouter{
+			Middlewares: []DocMiddleware{},
+			Routes:      map[string]DocRoute{},
+		}},
+		Routes:        map[string]DocRouter{},
+		FormattedHTML: "",
+		RouteHTML:     "",
+	}
 	if err := mu.generate(); err != nil {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}
@@ -103,7 +113,10 @@ func (mu *MarkupDoc) writeRoutes() {
 	// in routes map on the markdown struct. This is the structure we
 	// are going to render to markdown.
 	dr := mu.Doc.Router
-	ar := DocRouter{}
+	ar := DocRouter{
+		Middlewares: []DocMiddleware{},
+		Routes:      map[string]DocRoute{},
+	}
 	buildRoutesMap(mu, "", &ar, &ar, &dr)
 
 	routePaths := []string{}

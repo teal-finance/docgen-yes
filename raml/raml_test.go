@@ -7,12 +7,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/micheartin/docgen-yes/raml"
-	"github.com/micheartin/docgen-yes"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"github.com/micheartin/docgen-yes"
+	"github.com/micheartin/docgen-yes/raml"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -20,16 +19,28 @@ func TestWalkerRAML(t *testing.T) {
 	r := Router()
 
 	ramlDocs := &raml.RAML{
-		Title:     "Big Mux",
-		BaseUri:   "https://bigmux.example.com",
-		Version:   "v1.0",
-		MediaType: "application/json",
+		Title:         "Big Mux",
+		BaseURI:       "https://bigmux.example.com",
+		Protocols:     []string{},
+		MediaType:     "application/json",
+		Version:       "v1.0",
+		Documentation: []raml.Documentation{},
+		Resources:     map[string]*raml.Resource{},
 	}
 
 	if err := chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		handlerInfo := docgen.GetFuncInfo(handler)
 		resource := &raml.Resource{
-			Description: handlerInfo.Comment,
+			DisplayName:     "",
+			Description:     handlerInfo.Comment,
+			Responses:       map[int]raml.Response{},
+			Body:            map[string]raml.Example{},
+			Is:              []string{},
+			Example:         "",
+			SecuredBy:       []string{},
+			URIParameters:   map[string]raml.Example{},
+			QueryParameters: map[string]raml.Example{},
+			Resources:       map[string]*raml.Resource{},
 		}
 
 		return ramlDocs.Add(method, route, resource)
@@ -37,8 +48,7 @@ func TestWalkerRAML(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err := yaml.Marshal(ramlDocs)
-	if err != nil {
+	if _, err := yaml.Marshal(ramlDocs); err != nil {
 		t.Error(err)
 	}
 }
@@ -129,7 +139,10 @@ func ListArticles(w http.ResponseWriter, r *http.Request) {
 // Ppersists the posted Article and returns it
 // back to the client as an acknowledgement.
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
-	article := &Article{}
+	article := &Article{
+		ID:    "",
+		Title: "",
+	}
 
 	render.JSON(w, r, article)
 }
@@ -204,5 +217,5 @@ func dbGetArticle(id string) (*Article, error) {
 			return a, nil
 		}
 	}
-	return nil, errors.New("article not found.")
+	return nil, errors.New("article not found")
 }
