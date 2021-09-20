@@ -10,8 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
-	"github.com/micheartin/docgen-yes"
-	"github.com/micheartin/docgen-yes/raml"
+	"github.com/teal-finance/docgen-yes"
+	"github.com/teal-finance/docgen-yes/raml"
 	yaml "gopkg.in/yaml.v2"
 )
 

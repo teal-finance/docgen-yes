@@ -41,7 +41,7 @@ import (
   "net/http"
 
   "github.com/go-chi/chi/v5"
-  "github.com/micheartin/docgen-yes" // note the change
+  "github.com/teal-finance/docgen-yes" // note the change
 )
 ```
 

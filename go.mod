@@ -1,4 +1,4 @@
-module github.com/micheartin/docgen-yes
+module github.com/teal-finance/docgen-yes
 
 go 1.16
 

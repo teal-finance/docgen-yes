@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/micheartin/docgen-yes"
+	"github.com/teal-finance/docgen-yes"
 )
 
 func TestMarkupRoutesDoc(t *testing.T) {
