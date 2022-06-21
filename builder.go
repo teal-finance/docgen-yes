@@ -11,8 +11,7 @@ import (
 func BuildDoc(r chi.Routes) (Doc, error) {
 	d := Doc{}
 
-	goPath := getGoPath()
-	if goPath == "" {
+	if getGoPath() == "" {
 		return d, errors.New("docgen: unable to determine your $GOPATH")
 	}
 
