@@ -92,6 +92,8 @@ func getCallerFrame(i interface{}) *runtime.Frame {
 				pc = method.Func.Pointer()
 			}
 		}
+	default:
+		return nil // Do not support other types
 	}
 
 	frames := runtime.CallersFrames([]uintptr{pc})
