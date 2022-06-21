@@ -1,6 +1,7 @@
 package docgen
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -8,11 +9,11 @@ import (
 )
 
 func BuildDoc(r chi.Routes) (Doc, error) {
-	d := Doc{
-		Router: DocRouter{
-			Middlewares: []DocMiddleware{},
-			Routes:      map[string]DocRoute{},
-		},
+	d := Doc{}
+
+	goPath := getGoPath()
+	if goPath == "" {
+		return d, errors.New("docgen: unable to determine your $GOPATH")
 	}
 
 	// Walk and generate the router docs

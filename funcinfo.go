@@ -4,7 +4,6 @@ import (
 	"go/parser"
 	"go/token"
 	"net/http"
-	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
@@ -34,7 +33,7 @@ func GetFuncInfo(i interface{}) FuncInfo {
 		Unresolvable: false,
 	}
 	frame := getCallerFrame(i)
-	goPathSrc := filepath.Join(os.Getenv("GOPATH"), "src")
+	goPathSrc := filepath.Join(getGoPath(), "src")
 
 	if frame == nil {
 		fi.Unresolvable = true
@@ -79,16 +78,15 @@ func GetFuncInfo(i interface{}) FuncInfo {
 }
 
 func getCallerFrame(i interface{}) *runtime.Frame {
-	val := reflect.ValueOf(i)
+	values := reflect.ValueOf(i)
 	var pc uintptr
 
-	switch val.Kind() {
+	switch values.Kind() {
 	case reflect.Func:
-		pc = val.Pointer()
+		pc = values.Pointer()
 	case reflect.Ptr:
 		typ := reflect.TypeOf(i)
 		handlerType := reflect.TypeOf(new(http.Handler)).Elem()
-
 		if typ.Implements(handlerType) {
 			if method, ok := typ.Elem().MethodByName("ServeHTTP"); ok {
 				pc = method.Func.Pointer()
@@ -104,7 +102,6 @@ func getCallerFrame(i interface{}) *runtime.Frame {
 	if frame.Entry == 0 {
 		return nil
 	}
-
 	return &frame
 }
 
