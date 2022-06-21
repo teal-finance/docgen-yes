@@ -1,6 +1,7 @@
 package docgen
 
 import (
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"net/http"
@@ -12,13 +13,14 @@ import (
 
 // FuncInfo describes a function's metadata.
 type FuncInfo struct {
-	Pkg          string `json:"pkg"`
-	Func         string `json:"func"`
-	Comment      string `json:"comment"`
-	File         string `json:"file,omitempty"`
-	Line         int    `json:"line,omitempty"`
-	Anonymous    bool   `json:"anonymous,omitempty"`
-	Unresolvable bool   `json:"unresolvable,omitempty"`
+	Pkg          string    `json:"pkg"`
+	Func         string    `json:"func"`
+	Comment      string    `json:"comment"`
+	File         string    `json:"file,omitempty"`
+	ASTFile      *ast.File `json:"ast_file,omitempty"`
+	Line         int       `json:"line,omitempty"`
+	Anonymous    bool      `json:"anonymous,omitempty"`
+	Unresolvable bool      `json:"unresolvable,omitempty"`
 }
 
 // GetFuncInfo returns a FuncInfo object for a given interface.
@@ -71,7 +73,7 @@ func GetFuncInfo(i interface{}) FuncInfo {
 	}
 
 	if !fi.Unresolvable {
-		fi.Comment = getFuncComment(i, frame.File, frame.Line)
+		fi.Comment, fi.ASTFile = getFuncComment(i, frame.File, frame.Line)
 	}
 
 	return fi
@@ -120,31 +122,31 @@ func getPkgName(file string) string {
 	return astFile.Name.Name
 }
 
-func getFuncComment(i interface{}, file string, line int) string {
+func getFuncComment(i interface{}, file string, line int) (string, *ast.File) {
 	fset := token.NewFileSet()
 
 	astFile, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
 	if err != nil {
-		return ""
+		return "", nil
 	}
 
 	if len(astFile.Comments) == 0 {
-		return ""
+		return "", astFile
 	}
 	typNames := strings.Split(reflect.TypeOf(i).String(), ".")
 	typName := typNames[len(typNames)-1]
 
 	for _, cmt := range astFile.Comments {
 		if strings.HasPrefix(cmt.Text(), typName+" ") {
-			return cmt.Text()
+			return cmt.Text(), astFile
 		}
 	}
 
 	for _, cmt := range astFile.Comments {
 		if fset.Position(cmt.End()).Line+1 == line {
-			return cmt.Text()
+			return cmt.Text(), astFile
 		}
 	}
 
-	return ""
+	return "", astFile
 }
