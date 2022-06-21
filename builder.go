@@ -16,19 +16,22 @@ func BuildDoc(r chi.Routes) (Doc, error) {
 	}
 
 	// Walk and generate the router docs
-	d.Router = buildDocRouter(r)
+	d.Router = BuildDocRouter(r)
 
 	return d, nil
 }
 
-func buildDocRouter(r chi.Routes) DocRouter {
+func BuildDocRouter(r chi.Routes) DocRouter {
+	if r == nil {
+		return DocRouter{}
+	}
+
 	rts := r
 	dr := DocRouter{
 		Middlewares: []DocMiddleware{},
 		Routes:      map[string]DocRoute{},
 	}
-	drts := DocRoutes{}
-	dr.Routes = drts
+	dr.Routes = DocRoutes{}
 
 	for _, mw := range rts.Middlewares() {
 		dmw := DocMiddleware{
@@ -49,7 +52,7 @@ func buildDocRouter(r chi.Routes) DocRouter {
 
 		if rt.SubRoutes != nil {
 			subRoutes := rt.SubRoutes
-			subDrts := buildDocRouter(subRoutes)
+			subDrts := BuildDocRouter(subRoutes)
 			drt.Router = &subDrts
 		} else {
 			hall := rt.Handlers["*"]
@@ -92,7 +95,7 @@ func buildDocRouter(r chi.Routes) DocRouter {
 			}
 		}
 
-		drts[rt.Pattern] = drt
+		dr.Routes[rt.Pattern] = drt
 	}
 
 	return dr
