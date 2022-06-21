@@ -62,7 +62,7 @@ func P(text string) string {
 
 // Head creates a header for a given level eg H1, H2, H3...
 func Head(level int, text string) string {
-	if len(strings.TrimSpace(text)) == 0 {
+	if strings.TrimSpace(text) == "" {
 		// no text, no header
 		return ""
 	}
