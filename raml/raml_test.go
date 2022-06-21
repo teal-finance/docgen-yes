@@ -10,9 +10,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	yaml "gopkg.in/yaml.v2"
+
 	"github.com/teal-finance/docgen-yes"
 	"github.com/teal-finance/docgen-yes/raml"
-	yaml "gopkg.in/yaml.v2"
 )
 
 func TestWalkerRAML(t *testing.T) {
@@ -28,7 +29,7 @@ func TestWalkerRAML(t *testing.T) {
 		Resources:     map[string]*raml.Resource{},
 	}
 
-	if err := chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	if err := chi.Walk(r, func(method, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		handlerInfo := docgen.GetFuncInfo(handler)
 		resource := &raml.Resource{
 			DisplayName:     "",
@@ -182,7 +183,7 @@ func adminRouter() chi.Router {
 		_, _ = w.Write([]byte("admin: list accounts.."))
 	})
 	r.Get("/users/:userId", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(fmt.Sprintf("admin: view user id %v", chi.URLParam(r, "userId"))))
+		_, _ = fmt.Fprintf(w, "admin: view user id %v", chi.URLParam(r, "userId"))
 	})
 
 	return r

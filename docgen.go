@@ -46,7 +46,6 @@ func PrintRoutes(r chi.Routes) {
 				fmt.Println(parentPattern + rt.Pattern)
 			} else {
 				pat := rt.Pattern
-
 				subRoutes := rt.SubRoutes
 				printRoutes(parentPattern+pat, subRoutes)
 			}
@@ -61,6 +60,5 @@ func JSONRoutesDoc(r chi.Routes) string {
 	if err != nil {
 		panic(err)
 	}
-
 	return string(v)
 }

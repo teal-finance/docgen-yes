@@ -8,7 +8,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-var header = `#%RAML 1.0
+const header = `#%RAML 1.0
 ---
 `
 
@@ -65,7 +65,7 @@ type Example struct {
 	Required    bool   `yaml:"required,omitempty"`
 }
 
-func (r *RAML) Add(method string, route string, resource *Resource) error {
+func (r *RAML) Add(method, route string, resource *Resource) error {
 	if resource == nil {
 		return errors.New("raml.Add(): resource can't be nil")
 	}
@@ -76,7 +76,7 @@ func (r *RAML) Add(method string, route string, resource *Resource) error {
 	return r.Resources.upsert(method, route, resource)
 }
 
-func (r *RAML) AddUnder(parentRoute string, method string, route string, resource *Resource) error {
+func (r *RAML) AddUnder(parentRoute, method, route string, resource *Resource) error {
 	if resource == nil {
 		return errors.New("raml.Add(): resource can't be nil")
 	}
@@ -118,7 +118,7 @@ func (r *RAML) AddUnder(parentRoute string, method string, route string, resourc
 }
 
 // Find or create node tree from a given route and inject the resource.
-func (r Resources) upsert(method string, route string, resource *Resource) error {
+func (r Resources) upsert(method, route string, resource *Resource) error {
 	currentNode := r
 
 	parts := strings.Split(route, "/")
