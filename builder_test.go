@@ -78,7 +78,7 @@ func Test_GetFuncInfo(t *testing.T) {
 
 	cases := []struct {
 		name string
-		i    interface{}
+		i    any
 		want docgen.FuncInfo
 	}{{
 		name: "Unresolvable",

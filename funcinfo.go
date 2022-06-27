@@ -24,7 +24,7 @@ type FuncInfo struct {
 }
 
 // GetFuncInfo returns a FuncInfo object for a given interface.
-func GetFuncInfo(i interface{}) FuncInfo {
+func GetFuncInfo(i any) FuncInfo {
 	fi := FuncInfo{
 		Pkg:          "",
 		Func:         "",
@@ -79,7 +79,7 @@ func GetFuncInfo(i interface{}) FuncInfo {
 	return fi
 }
 
-func getCallerFrame(i interface{}) *runtime.Frame {
+func getCallerFrame(i any) *runtime.Frame {
 	values := reflect.ValueOf(i)
 	var pc uintptr
 
@@ -122,7 +122,7 @@ func getPkgName(file string) string {
 	return astFile.Name.Name
 }
 
-func getFuncComment(i interface{}, file string, line int) (string, *ast.File) {
+func getFuncComment(i any, file string, line int) (string, *ast.File) {
 	fset := token.NewFileSet()
 
 	astFile, err := parser.ParseFile(fset, file, nil, parser.ParseComments)

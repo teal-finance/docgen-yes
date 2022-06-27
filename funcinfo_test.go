@@ -8,7 +8,7 @@ import (
 
 func TestGetFuncInfo(t *testing.T) {
 	type args struct {
-		i interface{}
+		i any
 	}
 	tests := []struct {
 		name string
@@ -28,7 +28,7 @@ func TestGetFuncInfo(t *testing.T) {
 
 func Test_getCallerFrame(t *testing.T) {
 	type args struct {
-		i interface{}
+		i any
 	}
 	tests := []struct {
 		name string
