@@ -4,6 +4,7 @@ package docgen
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -55,10 +56,14 @@ func PrintRoutes(r chi.Routes) {
 }
 
 func JSONRoutesDoc(r chi.Routes) string {
+	return string(JSONRoutesBytes(r))
+}
+
+func JSONRoutesBytes(r chi.Routes) []byte {
 	doc, _ := BuildDoc(r)
-	v, err := json.MarshalIndent(doc, "", "  ")
+	b, err := json.MarshalIndent(doc, "", "  ")
 	if err != nil {
-		panic(err)
+		log.Panicf("docgen: json.MarshalIndent err: %q input: %+v", err, doc)
 	}
-	return string(v)
+	return b
 }

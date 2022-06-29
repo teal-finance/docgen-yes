@@ -197,20 +197,18 @@ func TestPrintRoutes(t *testing.T) {
 }
 
 func TestJSONRoutesDoc(t *testing.T) {
-	type args struct {
-		r chi.Routes
-	}
-	tests := []struct {
+	cases := []struct {
 		name string
-		args args
+		r chi.Routes
 		want string
 	}{
 		// TODO: Add test cases.
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := docgen.JSONRoutesDoc(tt.args.r); got != tt.want {
-				t.Errorf("JSONRoutesDoc() = %v, want %v", got, tt.want)
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := docgen.JSONRoutesDoc(c.r); got != c.want {
+				t.Errorf("JSONRoutesDoc() = %v, want %v", got, c.want)
 			}
 		})
 	}
