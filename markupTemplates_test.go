@@ -13,7 +13,7 @@ func TestBaseTemplate(t *testing.T) {
 
 	// check Base Template for expected template fields: {title}, {css}, {favicon.ico}, {intro}, {routes}
 	expectedFields := []string{"{title}", "{css}", "{favicon.ico}", "{intro}", "{routes}"}
-	bt := BaseTemplate()
+	bt := BaseTemplate
 	for _, field := range expectedFields {
 		assert.True(t, strings.Contains(bt, field))
 	}
@@ -119,12 +119,12 @@ func TestBaseTemplate1(t *testing.T) {
 		expectFail bool
 	}{
 		// TODO: Add test cases.
-		{"baseTest", BaseTemplate(), false},
+		{"baseTest", BaseTemplate, false},
 		{"failBlank", "", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := BaseTemplate(); got != tt.want && !tt.expectFail {
+			if got := BaseTemplate; got != tt.want && !tt.expectFail {
 				t.Errorf("BaseTemplate() = %v, want %v", got, tt.want)
 			}
 		})

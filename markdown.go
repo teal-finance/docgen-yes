@@ -47,6 +47,7 @@ func MarkdownRoutesDoc(r chi.Router, opts MarkdownOpts) string {
 		Routes: map[string]DocRouter{},
 		buf:    &bytes.Buffer{},
 	}
+
 	if err := md.Generate(); err != nil {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}

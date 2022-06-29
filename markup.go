@@ -42,7 +42,7 @@ type MarkupOpts struct {
 
 // MarkupRoutesDoc builds a document based on routes in a given router with given option set.
 func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
-	// Goal: rewrite this class to have a single exported function(?)
+	// TODO: rewrite this class to have a single exported function(?)
 	//    that returns a formatted HTML document based on a MarkupOpts
 	//     1) flatten router, build docs w/o recursion
 	//     2) Alternatively, build the JSON or Markdown doc and convert to HTML
@@ -62,9 +62,7 @@ func MarkupRoutesDoc(r chi.Router, opts MarkupOpts) string {
 		return fmt.Sprintf("ERROR: %s\n", err.Error())
 	}
 
-	formattedHTML := mu.String()
-
-	return formattedHTML
+	return mu.String()
 }
 
 // String pretty prints the document.
@@ -78,15 +76,13 @@ func (mu *MarkupDoc) generate() error {
 		return errors.New("docgen: router is nil")
 	}
 
-	doc, err := BuildDoc(mu.Router)
+	var err error
+	mu.Doc, err = BuildDoc(mu.Router)
 	if err != nil {
 		return err
 	}
 
-	mu.Doc = doc
-	//  mu.Buf = &bytes.Buffer{}
 	mu.Routes = make(map[string]DocRouter)
-
 	mu.writeRoutes()
 
 	r := strings.NewReplacer(
@@ -97,7 +93,7 @@ func (mu *MarkupDoc) generate() error {
 		"{favicon.ico}", FaviconIcoData(),
 	)
 
-	htmlString := r.Replace(BaseTemplate())
+	htmlString := r.Replace(BaseTemplate)
 	mu.FormattedHTML = htmlString
 
 	return nil
@@ -129,9 +125,7 @@ func (mu *MarkupDoc) writeRoutes() {
 	for _, pat := range routePaths {
 		dr := mu.Routes[pat]
 		mu.RouteHTML += "<div>" + P(pat)
-
 		printRouter(mu, 0, dr)
-
 		mu.RouteHTML += "</div>"
 	}
 }

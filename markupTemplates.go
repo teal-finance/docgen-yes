@@ -6,26 +6,23 @@ import (
 )
 
 // BaseTemplate is a basic html page with placeholders for: {title}, {css}, {intro}, and {routes}.
-func BaseTemplate() string {
-	return `
-    <html>
-      <head>
-        <title>{title}</title>
-        <style>{css}</style>
-        <link rel="icon" type="image/png" href="{favicon.ico}" />
-      </head>
-      <body>
-        <h1>{title}</h1>
-        <div>
-          {intro}
-        </div>
-        <div>
-          {routes}
-        </div>        
-      </body>
-    </html>
-  `
-}
+const BaseTemplate =` <html>
+<head>
+  <title>{title}</title>
+  <style>{css}</style>
+  <link rel="icon" type="image/png" href="{favicon.ico}" />
+</head>
+<body>
+  <h1>{title}</h1>
+  <div>
+    {intro}
+  </div>
+  <div>
+    {routes}
+  </div>        
+</body>
+</html>
+`
 
 // UnorderedList is a list using bullet points instead of numbers.
 func UnorderedList(listItems string) string {
