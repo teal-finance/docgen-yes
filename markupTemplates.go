@@ -6,7 +6,7 @@ import (
 )
 
 // BaseTemplate is a basic html page with placeholders for: {title}, {css}, {intro}, and {routes}.
-const BaseTemplate =` <html>
+const BaseTemplate = ` <html>
 <head>
   <title>{title}</title>
   <style>{css}</style>

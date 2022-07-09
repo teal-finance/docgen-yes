@@ -199,7 +199,7 @@ func TestPrintRoutes(t *testing.T) {
 func TestJSONRoutesDoc(t *testing.T) {
 	cases := []struct {
 		name string
-		r chi.Routes
+		r    chi.Routes
 		want string
 	}{
 		// TODO: Add test cases.
