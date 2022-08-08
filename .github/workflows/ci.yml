@@ -18,17 +18,17 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go-version }}
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        path: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
-    - name: Test
-      run: |
-        go get -d -t      ./...
-        go vet   -race    ./...
-        go build -race -v ./...
-        go test  -race -v ./...
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.GOPATH }}/src/github.com/${{ github.repository }}
+      - name: Test
+        run: |
+          go get -d -t            ./...
+          go vet   -race          ./...
+          go build -race -v       ./...
+          go test  -race -vet all ./...
