@@ -183,7 +183,7 @@ func adminRouter() chi.Router {
 		_, _ = w.Write([]byte("admin: list accounts.."))
 	})
 	r.Get("/users/:userId", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintf(w, "admin: view user id %v", chi.URLParam(r, "userId"))
+		_, _ = fmt.Fprint(w, "admin: view user id ", chi.URLParam(r, "userId"))
 	})
 
 	return r

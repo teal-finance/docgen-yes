@@ -57,7 +57,7 @@ func BuildDocRouter(r chi.Routes) DocRouter {
 		} else {
 			hall := rt.Handlers["*"]
 			for method, h := range rt.Handlers {
-				if method != "*" && hall != nil && fmt.Sprintf("%v", hall) == fmt.Sprintf("%v", h) {
+				if method != "*" && hall != nil && fmt.Sprint(hall) == fmt.Sprint(h) {
 					continue
 				}
 
